@@ -3,15 +3,16 @@
  * Licensed under the MIT license, http://opensource.org/licenses/MIT
  */
 
-var express  = require('express');
-var stylus   = require('stylus');
-var nib      = require('nib');
-var jade     = require('jade');
-var crypto   = require('crypto');
-var passport = require('passport');
-var merge    = require('merge');
+var express    = require('express');
+var stylus     = require('stylus');
+var nib        = require('nib');
+var jade       = require('jade');
+var crypto     = require('crypto');
+var passport   = require('passport');
+var merge      = require('merge');
+var fs         = require('fs');
 var formidable = require('formidable');
-var fs       = require('fs');
+var opmlimport = require('./opmlimport');
 var CoggleStrategy = require('passport-coggle-oauth2').OAuth2Strategy;
 
 // get environment variables we need:
@@ -122,17 +123,38 @@ app.get('/auth/deauth', function(req, res){
   return res.redirect('/');
 });
 
+// Handle uploaded files
 app.post('/upload', function(req, res, next){
+  if(!(req.session.access_tokens && req.session.access_tokens.coggle))
+    return next(new Error("not authenticated"));
+
   var form = new formidable.IncomingForm();
   form.maxFieldsSize = 200000;
   form.maxFields     = 10;
   
+  var results = {};
+  var expect_results = 0;
+  var received_all = false;
+
+  function checkIfComplete(){
+    if(expect_results === 0 && received_all){
+      res.send({error:null, results:results});
+    }
+  }
+
   form.on('file', function(field, file){
+    expect_results++;
     // read the file from the temporary directory, them rm it
     fs.readFile(file.path, function(err, data){
-      console.log('file contents:', data.length, data.toString());
-    
-      // !!! TODO: import to Coggle
+
+      opmlimport.process(data, function(err, url){
+        if(err)
+          results[file.name] = {error:true, message:err};
+        else
+          results[file.name] = {url:url};
+        expect_results--;
+        checkIfComplete();
+      });
 
       fs.unlink(file.path, function(err){
         if(err)
@@ -142,13 +164,11 @@ app.post('/upload', function(req, res, next){
   });
 
   form.on('end', function(){
-
-    // !!! TODO: send information about imported files back to the client
-
-    res.send({error:null, imported:{}});
+    received_all = true;
+    checkIfComplete();
   });
-  form.on('aborted', function() {
-    res.send({error:true, message:'upload aborted'});
+  form.on('aborted', function(){
+    next(new Error("upload aborted"));
   });
 
   form.parse(req);
