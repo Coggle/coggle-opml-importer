@@ -8,8 +8,9 @@
     "url": "http://github.com/Coggle/coggle-opml-importer.git"
   },
   "scripts": {
+    "postinstall": "bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "./node_modules/.bin/nodemon app.js"
   },
   "keywords": [
     "coggle",
@@ -42,7 +43,8 @@
     "grunt-contrib-jshint": "*",
     "grunt-contrib-watch": "*",
     "grunt-contrib-clean": "*",
-    "grunt-jsjsdoc": "*"
+    "grunt-jsjsdoc": "*",
+    "nodemon":">=1.0.17"
   },
   "engines": {
     "node": "0.10.x"

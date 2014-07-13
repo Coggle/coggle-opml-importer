@@ -19,6 +19,7 @@ requirejs.config({
         underscore: '../bower/underscore/underscore'
     },
     packages: [
+
     ]
 });
 

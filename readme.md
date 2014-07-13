@@ -30,7 +30,7 @@ run the app. If they are missing the app will refuse to start.
 ```bash
 COGGLE_CLIENT_ID=aaaaaaaaaaaaaaaaaaaaaaaa \
 COGGLE_CLIENT_SECRET=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
-node app.js
+npm start
 ```
 
 
