@@ -35,6 +35,7 @@
     "underscore": ">=1.6",
     "blueimp-tmpl": ">=2.5.3",
     "blueimp-load-image": ">=1.11.0",
-    "blueimp-canvas-to-blob": ">=2.1.0"
+    "blueimp-canvas-to-blob": ">=2.1.0",
+    "jquery-file-upload": ">=9.5.8"
   }
 }

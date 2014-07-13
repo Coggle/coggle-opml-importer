@@ -33,7 +33,8 @@
     "async": "*",
     "coggle": ">=0.1.2",
     "bower": "^1.3.8",
-    "bower-requirejs": "^0.11.0"
+    "bower-requirejs": "^0.11.0",
+    "formidable": "^1.0.15"
   },
   "devDependencies": {
     "grunt": "*",
@@ -44,7 +45,7 @@
     "grunt-contrib-watch": "*",
     "grunt-contrib-clean": "*",
     "grunt-jsjsdoc": "*",
-    "nodemon":">=1.0.17"
+    "nodemon": ">=1.0.17"
   },
   "engines": {
     "node": "0.10.x"

@@ -32,8 +32,8 @@ module.exports = function(grunt) {
     },
     watch: {
       app: {
-        files: ['./*.js', 'javascripts/*.js'],
-        tasks: ['jshint', 'build']
+        files: ['./*.js', 'javascripts/*.js', 'private/stylsheets/*.styl'],
+        tasks: ['jshint', 'stylus', 'build']
       }
     }
   });

@@ -10,6 +10,8 @@ var jade     = require('jade');
 var crypto   = require('crypto');
 var passport = require('passport');
 var merge    = require('merge');
+var formidable = require('formidable');
+var fs       = require('fs');
 var CoggleStrategy = require('passport-coggle-oauth2').OAuth2Strategy;
 
 // get environment variables we need:
@@ -101,7 +103,7 @@ passport.use(new CoggleStrategy({
 app.get('/', function(req, res){
   // render the view for the front page
   res.render('index', {
-            title: 'Coggle Issue Importer',
+            title: 'Coggle OPML Importer',
     access_tokens: req.session.access_tokens
   });
 });
@@ -118,6 +120,38 @@ app.get('/auth/coggle/failed', function(req, res){
 app.get('/auth/deauth', function(req, res){
   req.session.access_tokens = {};
   return res.redirect('/');
+});
+
+app.post('/upload', function(req, res, next){
+  var form = new formidable.IncomingForm();
+  form.maxFieldsSize = 200000;
+  form.maxFields     = 10;
+  
+  form.on('file', function(field, file){
+    // read the file from the temporary directory, them rm it
+    fs.readFile(file.path, function(err, data){
+      console.log('file contents:', data.length, data.toString());
+    
+      // !!! TODO: import to Coggle
+
+      fs.unlink(file.path, function(err){
+        if(err)
+          console.log(err);
+      });
+    });
+  });
+
+  form.on('end', function(){
+
+    // !!! TODO: send information about imported files back to the client
+
+    res.send({error:null, imported:{}});
+  });
+  form.on('aborted', function() {
+    res.send({error:true, message:'upload aborted'});
+  });
+
+  form.parse(req);
 });
 
 // Start the server!
