@@ -1,0 +1,50 @@
+{
+  "name": "coggle-opml-importer",
+  "version": "0.0.0",
+  "description": "Web app providing OPML file import into Coggle, using the Coggle API.",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/Coggle/coggle-opml-importer.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "keywords": [
+    "coggle",
+    "opml"
+  ],
+  "author": {
+    "name": "James Crosby",
+    "email": "james@coggle.it",
+    "url": "http://coggle.it/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "3.x",
+    "stylus": "*",
+    "nib": "*",
+    "jade": "*",
+    "merge": "*",
+    "passport": "*",
+    "passport-coggle-oauth2": "*",
+    "async": "*",
+    "coggle": ">=0.1.2",
+    "bower": "^1.3.8",
+    "bower-requirejs": "^0.11.0"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-stylus": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-jsjsdoc": "*"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}

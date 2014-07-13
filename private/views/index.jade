@@ -1,0 +1,15 @@
+extend layout
+block content
+  p
+    | This is a demo application to import OPML (outline) files into
+    | <a href="http://coggle.it">Coggle</a>.
+  
+  if !(access_tokens && access_tokens.coggle)
+    p
+      To get started, grant access to your Coggle account:
+    p
+      a(href="/auth/coggle") Authorize access to Coggle
+
+  if access_tokens
+    p.logout
+      a(href="/auth/deauth") Logout.

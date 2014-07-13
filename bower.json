@@ -1,0 +1,40 @@
+{
+  "name": "coggle-opml-importer",
+  "version": "0.0.0",
+  "title": "Coggle OPML Importer",
+  "description": "Web app providing OPML file import into Coggle, using the Coggle API.",
+  "keywords": [
+    "coggle",
+    "opml"
+  ],
+  "homepage": "http://github.com/Coggle/coggle-opml-importer",
+  "author": {
+    "name": "James Crosby",
+    "email": "james@coggle.it",
+    "url": "http://coggle.it/"
+  },
+  "maintainers": [
+    {
+      "name": "James Crosby",
+      "url": "http://coggle.it/"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Coggle/coggle-opml-importer.git"
+  },
+  "bugs": "https://github.com/Coggle/coggle-opml-importer/issues",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": ">=1.6",
+    "underscore": ">=1.6",
+    "blueimp-tmpl": ">=2.5.3",
+    "blueimp-load-image": ">=1.11.0",
+    "blueimp-canvas-to-blob": ">=2.1.0"
+  }
+}
