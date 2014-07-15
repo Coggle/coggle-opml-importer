@@ -127,6 +127,8 @@ app.get('/auth/deauth', function(req, res){
 app.post('/upload', function(req, res, next){
   if(!(req.session.access_tokens && req.session.access_tokens.coggle))
     return next(new Error("not authenticated"));
+  
+  var access_token = req.session.access_tokens.coggle;
 
   var form = new formidable.IncomingForm();
   form.maxFieldsSize = 200000;
@@ -147,7 +149,7 @@ app.post('/upload', function(req, res, next){
     // read the file from the temporary directory, them rm it
     fs.readFile(file.path, function(err, data){
 
-      opmlimport.process(data, function(err, url){
+      opmlimport.process(data, access_token, function(err, url){
         if(err)
           results[file.name] = {error:true, message:err};
         else
