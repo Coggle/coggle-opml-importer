@@ -7,39 +7,73 @@ var CoggleApi = require('coggle');
 var async     = require('async');
 var _         = require('underscore');
 
-var y_space = 20;
+var y_space = 10;
 var x_space = 150;
 
 function elementIsOutlineElement(el){
   return el.name().toLowerCase() === 'outline';
 }
 
-function addChildrenRecursive(opml_element, diagram_node, cb){
-  var children = _.filter(
-    opml_element.childNodes(), elementIsOutlineElement
-  );
+function xOffsetForChild(base_x_off, y_off, parent_height){
+  // Calculate the x-offset necessary for a child with a given vertical offset
+  var Arc_Angle = 60 * Math.PI / 180;
+  var radius = parent_height / (2 * Math.sin(Arc_Angle/2));
+  //
+  //                                                         _
+  //                                                    _-"  | |
+  //                                               _-"       |   + - - - - -
+  //                                          _-"            |   ||        |
+  //                                     _-"                 |   | |       |
+  //                                _-"              parent  |   | |       |
+  //                           _-"                  height/2 |   |  |      |
+  //                      _-"                                |   |  |      | y_off
+  //                 _-"\                                    |   |   |     |
+  //            _-"       \                                  |   |   |     |
+  //       _-"             \                                 |   |   |     |
+  //  _-"     Arc_Angle/2   |                                |   |   |     |
+  // -----------------------|--------------------------------|---|---| - - -
+  // :                                                       : dx:   :
+  // :                                                       :   :   :
+  // :                  radius * Math.cos(Arc_Angle/2)       :   :   :
+  // |-------------------------------------------------------|   :   :
+  // :                                                           :   :
+  // :          sqrt(radius*radius - y_off*y_off/4)              :   :
+  // |-----------------------------------------------------------|   :
+  // :                                                               :
+  // :                             radius                            :
+  // |---------------------------------------------------------------|
+  //
+  var dx = Math.sqrt(radius*radius - y_off*y_off) - radius * Math.cos(Arc_Angle/2);
+  
+  return base_x_off + dx;
+}
 
-  console.log('add children recursive:', opml_element.estimated_width, opml_element.estimated_height);
-  var y_off = -(opml_element.estimated_height || 0) / 2;
-  var x_off = x_space;
+function addChildrenRecursive(new_node, diagram_node, cb){
 
-  async.eachSeries(children, function(child_el, callback){
-    var text = child_el.attr('text');
-    var url  = child_el.attr('url');
-    
-    text = (text && text.value()) || '';
-    url  = (url && url.value()) || '';
+  console.log('add children recursive:', new_node.estimated_width, new_node.estimated_height);
+  var y_off = -(new_node.estimated_height || 0) / 2;
+  var base_x_off = x_space;
 
-    // if we have a URL, add it as a Markdown URL around the first line of text
+  async.eachSeries(new_node.children, function(new_child, callback){
+    var text = new_child.text;
+    var url  = new_child.url;
+
+    var first_line = text.split('\n')[0];
+    // if we have a URL, aud it as a Markdown URL around the first line of text
     if(url){
-      text = '[' + first_line + '](' + url + ')\n' + remaining_lines;
+      text = '[' + first_line + '](' + url + ')\n' + text.slice(first_line.length);
     }
+    // calculate a nice horizontal position for this child
+    var x_off = xOffsetForChild(base_x_off, y_off, new_node.estimated_height);
+    // place the parent item in the middle vertically compared to the child
+    // items:
+    y_off += (y_space + new_child.estimated_height) / 2;
     diagram_node.addChild(text, {x:x_off, y:y_off}, function(err, node){
       if(err)
         return callback(err);
-      addChildrenRecursive(child_el, node, callback);
+      addChildrenRecursive(new_child, node, callback);
     });
-    y_off += y_space + child_el.estimated_height;
+    y_off += (y_space + new_child.estimated_height) / 2;
 
   }, cb);
 }
@@ -47,32 +81,40 @@ function addChildrenRecursive(opml_element, diagram_node, cb){
 function estimateSizeOfText(text, level){
   // approximate Coggle text sizes at different levels:
   var textsize = [17, 15.3, 13, 11, 9.4, 9][Math.min(level, 5)];
+  var lines = text.split('\n').length;
   return {
      width: text.length * textsize, // very approximate! really we should use proper font metrics here
-    height: textsize
+    height: textsize * 1.5 * lines
   };
 }
 
-function tagWithSizesRecursive(el, level){
+function calculateNodeLayoutRecursive(el, level){
   var children_total_height = 0;
-  var children = _.filter(el.childNodes(), elementIsOutlineElement);
+  var child_els = _.filter(el.childNodes(), elementIsOutlineElement);
+  var node = {};
+  var child_nodes = [];
 
-  for(var i = 0; i < children.length; i++){
-    var child = children[i];
-    tagWithSizesRecursive(child, level+1);
-
-    children_total_height += child.estimated_height;
-
-    if(i+1 < children.length)
-      children_total_height += y_space;
+  for(var i = 0; i < child_els.length; i++){
+    child_nodes.push(calculateNodeLayoutRecursive(child_els[i], level+1));
   }
+  children_total_height = _.reduce(
+      _.map(child_nodes, function(n){return n.estimated_height;}),
+      function(a, b){return a + y_space + b;},
+      0
+  );
 
-  var text = el.attr('text');
-  text = (text && text.value()) || '';
-  var own_size = estimateSizeOfText(text, level);
+  node.text = el.attr('text');
+  node.text = (node.text && node.text.value()) || '';
+  node.url = el.attr('url');
+  node.url = (node.url && node.url.value()) || '';
+  node.children = child_nodes;
 
-  el.estimated_width  = own_size.width;
-  el.estimated_height = own_size.height + children_total_height;
+  var own_size = estimateSizeOfText(node.text, level);
+
+  node.estimated_width  = own_size.width;
+  node.estimated_height = own_size.height + children_total_height;
+
+  return node;
 }
 
 function importOutlineToCoggle(root_el, diagram, callback){
@@ -83,12 +125,12 @@ function importOutlineToCoggle(root_el, diagram, callback){
   diagram.getNodes(function(err, nodes){
     if(err)
       return callback(err);
-    var root_node = nodes[0];
+    var diagram_root_node = nodes[0];
     
     // add .estimated_width and .estimated_height tags for each branch
-    tagWithSizesRecursive(root_el, 0);
+    root_to_add = calculateNodeLayoutRecursive(root_el, 0);
 
-    addChildrenRecursive(root_el, root_node, function(err){
+    addChildrenRecursive(root_to_add, diagram_root_node, function(err){
         callback(err, diagram.webUrl());
     });
   });
