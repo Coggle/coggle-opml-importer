@@ -10,7 +10,8 @@
   "scripts": {
     "postinstall": "bower install",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "./node_modules/.bin/nodemon app.js"
+    "devstart": "./node_modules/.bin/nodemon app.js",
+    "start": "node app.js"
   },
   "keywords": [
     "coggle",
