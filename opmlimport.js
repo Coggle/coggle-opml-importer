@@ -7,20 +7,23 @@ var CoggleApi = require('coggle');
 var async     = require('async');
 var _         = require('underscore');
 
-// !!! FIXME: need better layout!
+var y_space = 20;
+var x_space = 150;
+
+function elementIsOutlineElement(el){
+  return el.name().toLowerCase() === 'outline';
+}
+
 function addChildrenRecursive(opml_element, diagram_node, cb){
   var children = _.filter(
-    opml_element.childNodes(),
-    function(el){
-      return el.name().toLowerCase() === 'outline';
-    }
+    opml_element.childNodes(), elementIsOutlineElement
   );
 
-  var x_off = 150;
-  var y_off = 0;
-  var y_space = 50;
+  console.log('add children recursive:', opml_element.estimated_width, opml_element.estimated_height);
+  var y_off = -(opml_element.estimated_height || 0) / 2;
+  var x_off = x_space;
 
-  async.each(children, function(child_el, callback){
+  async.eachSeries(children, function(child_el, callback){
     var text = child_el.attr('text');
     var url  = child_el.attr('url');
     
@@ -33,12 +36,43 @@ function addChildrenRecursive(opml_element, diagram_node, cb){
     }
     diagram_node.addChild(text, {x:x_off, y:y_off}, function(err, node){
       if(err)
-        return cb(err);
-      addChildrenRecursive(child_el, node, cb);
+        return callback(err);
+      addChildrenRecursive(child_el, node, callback);
     });
-    y_off += y_space;
+    y_off += y_space + child_el.estimated_height;
 
   }, cb);
+}
+
+function estimateSizeOfText(text, level){
+  // approximate Coggle text sizes at different levels:
+  var textsize = [17, 15.3, 13, 11, 9.4, 9][Math.min(level, 5)];
+  return {
+     width: text.length * textsize, // very approximate! really we should use proper font metrics here
+    height: textsize
+  };
+}
+
+function tagWithSizesRecursive(el, level){
+  var children_total_height = 0;
+  var children = _.filter(el.childNodes(), elementIsOutlineElement);
+
+  for(var i = 0; i < children.length; i++){
+    var child = children[i];
+    tagWithSizesRecursive(child, level+1);
+
+    children_total_height += child.estimated_height;
+
+    if(i+1 < children.length)
+      children_total_height += y_space;
+  }
+
+  var text = el.attr('text');
+  text = (text && text.value()) || '';
+  var own_size = estimateSizeOfText(text, level);
+
+  el.estimated_width  = own_size.width;
+  el.estimated_height = own_size.height + children_total_height;
 }
 
 function importOutlineToCoggle(root_el, diagram, callback){
@@ -51,6 +85,9 @@ function importOutlineToCoggle(root_el, diagram, callback){
       return callback(err);
     var root_node = nodes[0];
     
+    // add .estimated_width and .estimated_height tags for each branch
+    tagWithSizesRecursive(root_el, 0);
+
     addChildrenRecursive(root_el, root_node, function(err){
         callback(err, diagram.webUrl());
     });
@@ -83,25 +120,4 @@ exports.process = function(opml_data, acess_token, callback){
       return callback(err);
     importOutlineToCoggle(body, diagram, callback);
   });
-    
-  /*
-  function printOutlineRecursive(el, indent){
-    var text = el.attr('text');
-    var url  = el.attr('url');
-    
-    text = (text && text.value()) || '';
-    url  = (url && url.value()) || '';
-
-    console.log(Array(indent+1).join(' '), text, url);
-    var children = el.childNodes();
-    for(var i = 0; i < children.length; i++){
-      if(children[i].name().toLowerCase() === 'outline'){
-        printOutlineRecursive(children[i], indent+2);
-      }
-    }
-  }
-  printOutlineRecursive(body, 0);
-
-  callback();
-  */
 };

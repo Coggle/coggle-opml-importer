@@ -151,7 +151,7 @@ app.post('/upload', function(req, res, next){
 
       opmlimport.process(data, access_token, function(err, url){
         if(err)
-          results[file.name] = {error:true, message:err};
+          results[file.name] = {error:true, message:err.message};
         else
           results[file.name] = {url:url};
         expect_results--;
