@@ -55,7 +55,7 @@ function compileStyl(str, path){
     .use(nib());
 }
 app.use(stylus.middleware({
-      src: __dirname + '/',
+      src: __dirname + '/private',
      dest: __dirname + '/public',
   compile: compileStyl
 }));
