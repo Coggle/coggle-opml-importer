@@ -1,5 +1,5 @@
 
-requirejs(['jquery', 'jquery.fileupload'], function($){
+requirejs(['jquery', 'jquery.fileupload', 'jquery.fileupload-process', 'jquery.fileupload-validate'], function($){
     var url = 'upload';
 
     function spinner(){
@@ -15,32 +15,33 @@ requirejs(['jquery', 'jquery.fileupload'], function($){
          acceptFileTypes: /\.opml$/i,
              maxFileSize: 200000,
         maxNumberOfFiles: 10
-    }).on('fileuploadadd', function (e, data) {
-        data.context = $('<div class="file"/>').appendTo('#files');
-        $.each(data.files, function (index, file) {
-            $('<p/>')
-                .attr('filename', file.name)
-                .append($('<span/>')
-                .text(file.name))
-                .append(spinner())
-                .appendTo(data.context);
-                
-        });
-    }).on('fileuploadprogressall', function(e, data){
-        var progress = parseInt(data.loaded / data.total * 100, 10);
-        $('#progress .progress-bar').css(
-            'width', progress + '%'
-        );
-    }).on('fileuploaddone',  function(e, data){
 
+    }).on('fileuploadprocessalways', function (e, data) {
+        data.context = $('<div class="file"/>').appendTo('#files');
+        $.each(data.files, function(index, file) {
+            if(file.error){
+                $('<span class="error"/>')
+                    .text(file.error)
+                    .appendTo(data.context);
+            }else{
+                $('<p/>')
+                    .attr('filename', file.name)
+                    .append($('<span/>')
+                    .text(file.name))
+                    .append(spinner())
+                    .appendTo(data.context);
+            }
+        });
+    }).on('fileuploaddone',  function(e, data){
         console.log('upload done, data:', data.result);
 
         for(filename in data.result.results){
             if(data.result.results.hasOwnProperty(filename)){
                 var result = data.result.results[filename];
                 var url = result.url;
-
-                item = $(data.context.find('[filename="' + filename + '"]'));
+                
+                item = $('#files').find('[filename="' + filename + '"]');
+                item.find('.spinner').remove();
                 if(url){
                     item.wrap(
                         $('<a>')
@@ -56,7 +57,7 @@ requirejs(['jquery', 'jquery.fileupload'], function($){
     }).on('fileuploadfail', function(e, data){
         $.each(data.files, function(index, file){
             var error = $('<span class="error"/>').text('Upload failed.');
-            var item = $(data.context.children()[index]);
+            var item = $('#files').find('[filename="' + file.name + '"]');
             item.append('<br>').append(error);
             item.find('.spinner').remove();
         });

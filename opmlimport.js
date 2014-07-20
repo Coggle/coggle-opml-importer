@@ -144,7 +144,12 @@ exports.process = function(opml_data, acess_token, callback){
   });
     
   // Parse the OPML using libxmljs
-  var doc  = libxmljs.parseXmlString(opml_data.toString());
+  var doc;
+  try{
+    doc  = libxmljs.parseXmlString(opml_data.toString());
+  }catch(e){
+    return callback(new Error("Not a valid OPML file: " + e.message));
+  }
   var title = doc.get('//title');
   var body = doc.get('//body');
 
