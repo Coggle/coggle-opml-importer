@@ -1,21 +1,21 @@
 extend layout
 block content
-  p
-    | This is a demo application to import OPML (outline) files into
-    | <a href="http://coggle.it">Coggle.</a>
+  p This is a demo application to import OPML (outline) files into 
+    a(href="http://coggle.it") Coggle.
   
   if !(access_tokens && access_tokens.coggle)
     p To get started, grant access to your Coggle account:
     p
       a(href="/auth/coggle") Authorize access to Coggle
+
   else
     div#drop-target
-      p drop files here
+      p drag and drop files here
 
-  div#progress
-    div.progress-bar
+      div#progress
+        div.progress-bar
 
-  div#files
+      div#files
 
   if access_tokens
     p.logout

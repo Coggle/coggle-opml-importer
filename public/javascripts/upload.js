@@ -1,6 +1,14 @@
 
 requirejs(['jquery', 'jquery.fileupload'], function($){
     var url = 'upload';
+
+    function spinner(){
+        return $('<div class="spinner"/>')
+                .append($('<div class="bounce1"/>'))
+                .append($('<div class="bounce2"/>'))
+                .append($('<div class="bounce3"/>'));
+    }
+
     $('#drop-target').fileupload({
                      url: url,
                 dataType: 'json',
@@ -8,12 +16,15 @@ requirejs(['jquery', 'jquery.fileupload'], function($){
              maxFileSize: 200000,
         maxNumberOfFiles: 10
     }).on('fileuploadadd', function (e, data) {
-        data.context = $('<div/>').appendTo('#files');
+        data.context = $('<div class="file"/>').appendTo('#files');
         $.each(data.files, function (index, file) {
             $('<p/>')
+                .attr('filename', file.name)
                 .append($('<span/>')
                 .text(file.name))
+                .append(spinner())
                 .appendTo(data.context);
+                
         });
     }).on('fileuploadprogressall', function(e, data){
         var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -23,35 +34,31 @@ requirejs(['jquery', 'jquery.fileupload'], function($){
     }).on('fileuploaddone',  function(e, data){
 
         console.log('upload done, data:', data.result);
-        if(data.result.error){
-        }
 
         for(filename in data.result.results){
             if(data.result.results.hasOwnProperty(filename)){
                 var result = data.result.results[filename];
                 var url = result.url;
 
-                console.log('uploaded:', filename, url);
+                item = $(data.context.find('[filename="' + filename + '"]'));
                 if(url){
-                    // !!! FIXME: find the child with the right filename (add
-                    // and select by attribute?)
-                    $(data.context.children()[0]).wrap(
+                    item.wrap(
                         $('<a>')
                             .attr('target', '_blank')
                             .prop('href', url)
                     );
                 }else{
-                    // !!! FIXME: find the child with the right filename (add
-                    // and select by attribute?)
-                    var error = $('<span class="text-danger"/>').text(result.message);
-                    $(data.context.children()[0]).append('<br>').append(error);
+                    var error = $('<span class="error"/>').text(result.message);
+                    item.append('<br>').append(error);
                 }
             }
         }
     }).on('fileuploadfail', function(e, data){
         $.each(data.files, function(index, file){
-            var error = $('<span class="text-danger"/>').text('Upload failed.');
-            $(data.context.children()[index]).append('<br>').append(error);
+            var error = $('<span class="error"/>').text('Upload failed.');
+            var item = $(data.context.children()[index]);
+            item.append('<br>').append(error);
+            item.find('.spinner').remove();
         });
     });
 });

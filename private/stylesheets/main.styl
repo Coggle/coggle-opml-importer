@@ -4,6 +4,7 @@
 opml-blue = #2b91a2
 lightgrey = #f3f3f3
 lightblack = #2a2a2a
+midgrey = #a2a2a2
 white = #fefefe
 link-blue = #5bb7e3
 midgrey = darken(lightgrey, 30%)
@@ -56,15 +57,27 @@ a:visited
 p
   margin 20px 10px
 
-p.hint
-  color midgrey
-
 #error
   color darken(red, 30%)
   background-color lighten(red, 80%)
   border-radius 6px
 #error div
   padding 8px
+
+#drop-target
+  border: 8px dotted midgrey
+  border-radius: 20px
+  text-align: center
+  padding: 20px
+
+.file
+  background-color: lightgrey
+  border-radius: 8px
+  margin: 10px 0
+  padding: 4px
+
+.file p
+  margin: 8px 4px
 
 .logout
   padding 0
@@ -89,7 +102,7 @@ footer
 .spinner > div 
   width 14px
   height 14px
-  background-color coggle-green
+  background-color opml-blue
 
   border-radius 100%
   display inline-block

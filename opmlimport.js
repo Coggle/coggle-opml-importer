@@ -50,7 +50,6 @@ function xOffsetForChild(base_x_off, y_off, parent_height){
 
 function addChildrenRecursive(new_node, diagram_node, cb){
 
-  console.log('add children recursive:', new_node.estimated_width, new_node.estimated_height);
   var y_off = -(new_node.estimated_height || 0) / 2;
   var base_x_off = x_space;
 
