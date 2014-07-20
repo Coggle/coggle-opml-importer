@@ -14,7 +14,8 @@ requirejs(['jquery', 'jquery.fileupload', 'jquery.fileupload-process', 'jquery.f
                 dataType: 'json',
          acceptFileTypes: /\.opml$/i,
              maxFileSize: 200000,
-        maxNumberOfFiles: 10
+        maxNumberOfFiles: 10,
+                 timeout: 180000
 
     }).on('fileuploadprocessalways', function (e, data) {
         data.context = $('<div class="file"/>').appendTo('#files');
