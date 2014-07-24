@@ -6,6 +6,8 @@ Coggle OPML importer is a node.js demo application for the Coggle API that impor
 
 The user is authenticated to the Coggle API using OAuth. The [passport-coggle-oauth2](https://github.com/coggle/passport-coggle-oauth2) module is used to authorize users, and retrieve an access token that can be sent along with requests to prove that the application is allowed create Coggles for the logged-in user.
 
+### Try It [Here](http://opmloggle.herokuapp.com)!
+
 ### Get the Code! 
 First install [node.js](http://nodejs.org/download/), then:
 ```bash

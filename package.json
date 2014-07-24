@@ -17,6 +17,7 @@
     "coggle",
     "opml"
   ],
+  "homepage": "http://opmloggle.herokuapp.com",
   "author": {
     "name": "James Crosby",
     "email": "james@coggle.it",
