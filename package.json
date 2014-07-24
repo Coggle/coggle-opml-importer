@@ -1,6 +1,6 @@
 {
   "name": "coggle-opml-importer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Web app providing OPML file import into Coggle, using the Coggle API.",
   "main": "app.js",
   "repository": {
