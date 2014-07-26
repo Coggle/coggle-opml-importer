@@ -20,21 +20,24 @@ npm install
 To use the Coggle API you need a Client ID, and a Client Secret – which Coggle uses to identify requests to the applications that made them.
 
 A new Client ID and Client Secret can be created at
-[http://coggle.it/developer](http://coggle.it/developer). The redirect URL
-should be the domain (and optionally port) where you will host the application
-(for example, `localhost` or `localhost:5000` for testing) followed by
+[http://coggle.it/developer](http://coggle.it/developer), where you can also
+configure the authentication redirect URL, which should be the domain (and
+optionally port) where you will host the application followed by
 `/auth/coggle/callback`, which is the Coggle oauth authentication callback
-route of the app.
+route of the app. For example, to run the app locally you would set it to this:
 
-This ID and secret pair needs to be provided as environment variables when you
-run the app. If they are missing the app will refuse to start.
+```
+localhost:5000/auth/coggle/callback
+```
+
+The Client ID and Client Secret both need to be provided as environment variables when you
+run the app. If they are missing the app will refuse to start. If they are incorrect, requests made by the app will fail. For example, to start the app in development mode run:
 
 ```bash
 COGGLE_CLIENT_ID=aaaaaaaaaaaaaaaaaaaaaaaa \
 COGGLE_CLIENT_SECRET=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
 npm devstart
 ```
-
 
 ### License
 [The MIT License](http://opensource.org/licenses/MIT)
