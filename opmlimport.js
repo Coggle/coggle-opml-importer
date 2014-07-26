@@ -84,8 +84,7 @@ exports.process = function(opml_data, acess_token, callback){
   // Create a Coggle API Client, see https://github.com/coggle/coggle-js for
   // documentation
   var coggle = new CoggleApi({
-    token: acess_token,
- base_url: "http://localdev.coggle.it"
+    token: acess_token
   });
     
   // Parse the OPML using libxmljs
