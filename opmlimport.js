@@ -17,7 +17,7 @@ function elementIsOutlineElement(el){
 function addChildrenRecursive(new_node, diagram_node, cb){
   var y_off = 0;
 
-  async.eachSeries(new_node.children, function(new_child, callback){
+  async.each(new_node.children, function(new_child, callback){
     var text = new_child.text;
     var url  = new_child.url;
 
